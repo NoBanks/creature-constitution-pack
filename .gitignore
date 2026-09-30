@@ -1,0 +1,21 @@
+.venv/
+__pycache__/
+build/harvestbench/
+build/inspect_evals_src/
+build/logs/smoke/
+build/logs_*.log
+build/logs_*.json
+guard/logs/aborted_lightning_2026-09-29/
+guard/logs/interrupted_partials/
+guard/logs/smoke/
+*.pyc
+.DS_Store
+# private working docs (never public)
+CONTEXT_HANDOFF_*.md
+PROPOSAL_DRAFT_*.md
+EMAIL_TO_MARCUS_*.txt
+RESEARCH_FUNDABLE_PROJECT_*.md
+PROJECT_PLAN_*.html
+*.html
+corpus/11_falcon_fund_funder_context.md
+corpus/13_competition_watch.md

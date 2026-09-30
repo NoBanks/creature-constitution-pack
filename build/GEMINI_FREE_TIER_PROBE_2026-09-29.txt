@@ -1,0 +1,28 @@
+Gemini (Google AI Studio free tier) probe receipts, 2026-09-29, 43 keys from ~/.openclaw/gemini-keys.json
+Key values never printed. All calls to generativelanguage.googleapis.com (never Vertex).
+
+1) Single-stream throughput through gemini_rotating_proxy.py, tiny "Say ok" requests, 75 s each (11:50 PT):
+   gemini-3.5-flash-lite: 53 ok, 0 failed in 75s -> 42.3 ok/min
+   gemini-2.5-flash-lite: 39 ok, 4 failed in 76s -> 31.0 ok/min
+   gemini-3.5-flash:      20 ok, 0 failed in 76s -> 15.8 ok/min
+   gemini-3-flash-preview: 29 ok, 0 failed in 79s -> 22.1 ok/min
+   gemini-2.5-flash:       1 ok, 1 failed in 141s -> 0.4 ok/min   (exhausted for the day after ~130 earlier calls)
+
+2) Actual TAC-harness run, google/gemini-3.5-flash-lite via Inspect's native google provider, max_connections=1
+   (log 2026-09-29T18-49-18 tac-pack, deleted as partial): 9 of 24 baseline samples in 60 minutes.
+   Per-sample times: 12s, 13s, 271s, 11s, 28s, 13s, 865s, ... Normal samples take 11-28 s; about one in
+   four hangs 5-15 minutes while the proxy cycles every key and gets 429 from all of them.
+   Proxy counters at kill time: {"requests": 234, "ok": 208, "rate_limited": 3341, "errors": 8}
+
+3) Request-size test on gemini-3.5-flash-lite, direct REST, 6 different keys per row (12:55 PT):
+   small system prompt, no tools, no thinking : 200, 429, 429, 429, 200, 200
+   small system prompt, tools + thinking      : 200, 429, 429, 429, 200, 200
+   TAC-sized system prompt (~3K tok), tools + thinking : 429, 429, 429, 429, 429, 429
+   TAC-sized system prompt, no tools, no thinking      : 429, 429, 429, 429, 429, 429
+   429 quota metrics named: 'API requests' (limit 'Request limit per minute for a region'),
+   'Generate Content API requests per minute', and several 429s with EMPTY quota details.
+
+Conclusion: on this day the free tier accepted only small requests; every TAC-sized request was
+refused on every key tested. Gemini rows were therefore dropped from the pilot rather than reported
+from a handful of surviving samples. A single project with paid-tier quota, or an overnight run at
+whatever trickle the free tier allows, would be needed for Gemini numbers.
